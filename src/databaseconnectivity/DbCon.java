@@ -15,7 +15,7 @@ public class DbCon {
             con = DriverManager.getConnection(URL+db, uname, pwd);
             return con;
         }
-        catch(Exception e) {
+        catch(ClassNotFoundException | SQLException e) {
             JOptionPane.showMessageDialog(null, "Error in Connectivity!");
         }
         return null;

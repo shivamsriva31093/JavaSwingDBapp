@@ -6,7 +6,10 @@
 package databaseconnectivity.forms;
 
 import databaseconnectivity.DbCon;
+import java.awt.Button;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -484,21 +487,56 @@ public class CRUD_form extends javax.swing.JFrame {
                     JLabel heading = new JLabel("To access database, please fill the required details:");
                     JTextField field1 = new JTextField("");
                     JTextField field2 = new JTextField("");
+                    Button button = new Button("Test connection");
+                    button.addActionListener(new ActionListener() {
+                              @Override
+                              public void actionPerformed(ActionEvent e) {
+                                       checkConnectivity(field1.getText(), field2.getText());
+                              }
+                    });
+                    
                     JPanel panel = new JPanel(new GridLayout(0, 1));
                     panel.add(heading);
                     panel.add(new JLabel("Username"));
                     panel.add(field1);
                     panel.add(new JLabel("Password"));
                     panel.add(field2);
+                    panel.add(button);
+                    
                     int result = JOptionPane.showConfirmDialog(null, panel, "Test",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                    if (result == JOptionPane.OK_OPTION) {
-                              uname = field1.getText();
-                              pwd = field2.getText();
-                              initComponents();
-                    } else {
-                        System.out.println("Cancelled");
-                        System.exit(0);
+                    switch(result) {
+                              case JOptionPane.OK_OPTION:
+                                        handleOkResponse(field1.getText(), field2.getText());
+                                        break;
+                              case JOptionPane.CANCEL_OPTION:
+                                        System.exit(0);
+                                        break;
                     }
+          }
+
+          private void handleOkResponse(String uname, String pwd) {
+                    if(uname.isEmpty()) {
+                              JOptionPane.showMessageDialog(null, "username can't be blank!");
+                              displayPopUp();
+                              
+                    } else {
+                              if(checkConnectivity(uname, pwd)) {
+                                        this.uname = uname;
+                                        this.pwd = pwd;
+                                        initComponents();
+                              } else {
+                                        displayPopUp();
+                              }
+                    }
+          }
+
+          private boolean checkConnectivity(String uname, String pwd) {
+                    Connection conn = dbCon.getConnection("test", uname, pwd);
+                    if(conn != null) {
+                              JOptionPane.showMessageDialog(null, "Connection successful");
+                              return true;
+                    }
+                    return false;
           }
 }
